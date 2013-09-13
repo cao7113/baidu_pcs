@@ -98,7 +98,7 @@ module BaiduPcs
     ###############################################################
     #             Advanced
     #获取指定图片文件的缩略图
-    def self.thumnail(rpath, opts={})
+    def self.thumbnail(rpath, opts={})
       params = method_params(:generate, path: "#{Config.app_root}/rpath").merge(opts.slice!(:quality, :height, :width))
       get("#{PCS_BASE_URL}/thumbnail", params, opts)
     end
