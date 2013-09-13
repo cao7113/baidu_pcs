@@ -20,7 +20,7 @@ Or install it yourself as:
 
 Steps: 
 
-* create a [PCS][1] [source of this content](http://github.github.com/github-flavored-markdown/sample_content.html) app and enable pcs api permissions!
+* create a [baidu PCS app](http://developer.baidu.com/ms/pcs) and enable pcs api permissions!
 * `baidu_pcs setup _app_name _api_key _secret_key`
 * `baidu_pcs config`
 * get help by `baidupcs --help`
@@ -62,5 +62,3 @@ cao@tj-desktop:~/dev/baidu_pcs$ baidupcs ls
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-[1] http://developer.baidu.com/ms/pcs "PCS"
