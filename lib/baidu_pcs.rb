@@ -2,8 +2,9 @@ require 'typhoeus'
 require 'multi_json'
 require 'fileutils'
 require 'yaml'
+
+require "baidu_pcs/core_ext"
 require "baidu_pcs/version"
-require "baidu_pcs/util"
 
 module BaiduPcs
 
