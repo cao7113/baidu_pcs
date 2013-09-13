@@ -18,6 +18,8 @@ Or install it yourself as:
 
 ## Usage
 
+Warning: in development, just try this, 另一个C语言实现的[命令行工具](https://github.com/emptyhua/baidu_pcs_cli) 
+
 Steps: 
 
 * create a [baidu PCS app](http://developer.baidu.com/ms/pcs) and enable pcs api permissions!
