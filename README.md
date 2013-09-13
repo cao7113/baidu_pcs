@@ -20,7 +20,7 @@ Or install it yourself as:
 
 Steps: 
 
-* create a baidu app in baidu dev center and enable pcs api permissions!
+* create a [baidu app] [1]  and enable pcs api permissions!
 * `baidu_pcs setup _app_name _api_key _secret_key`
 * `baidu_pcs config`
 * get help by `baidupcs --help`
@@ -44,3 +44,5 @@ Steps:
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+[1] http://developer.baidu.com/ms/pcs "PCS"

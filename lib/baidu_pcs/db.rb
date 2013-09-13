@@ -7,7 +7,7 @@ module BaiduPcs
   class Db < Base
     DB_BASE_URL = "#{PCS_BASE_URL}/structure"
     TABLE_BASE_URL = "#{DB_BASE_URL}/table"
-    DATA_BASE_URL = "#{DB_BASE_URL}/table"
+    DATA_BASE_URL = "#{DB_BASE_URL}/data"
 
     def self.create_table(tbl_name, opts={})
       params = method_params(:create, v: "1.0", sk: Config.secret_key, table: tbl_name)
