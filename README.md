@@ -1,6 +1,6 @@
 # BaiduPcs
 
-Try baidu pcs using ruby!
+Try [baidu pcs](http://developer.baidu.com/ms/pcs) using ruby!
 
 ## Installation
 
@@ -23,8 +23,8 @@ WARNING: in development, just try this, 另一个C语言实现的[命令行工�
 Steps: 
 
 * create a [baidu PCS app](http://developer.baidu.com/ms/pcs) and enable pcs api permissions!
-* `baidu_pcs setup _app_name _api_key _secret_key`
-* `baidu_pcs config` to get an access token
+* `baidupcs setup _app_name _api_key _secret_key`
+* `baidupcs config` to get an access token
 * get help by `baidupcs --help` at any time
 * another bins: `baidupcs_db, baidupcs_local`
 
