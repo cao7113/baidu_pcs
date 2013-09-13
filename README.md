@@ -20,7 +20,7 @@ Or install it yourself as:
 
 Steps: 
 
-* create a [PCS] [1] app and enable pcs api permissions!
+* create a [PCS][1] [source of this content](http://github.github.com/github-flavored-markdown/sample_content.html) app and enable pcs api permissions!
 * `baidu_pcs setup _app_name _api_key _secret_key`
 * `baidu_pcs config`
 * get help by `baidupcs --help`
