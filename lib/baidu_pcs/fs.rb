@@ -73,7 +73,6 @@ module BaiduPcs
     def self.diff(rpath)
     end
 
-
     def md5
       isdir? ? nil : block_list.first
     end

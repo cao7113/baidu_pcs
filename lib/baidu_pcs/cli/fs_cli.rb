@@ -92,9 +92,35 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
     end
 
     desc "compare [RPATH]", "比对文件或目录元信息"
+    option :ondup, type: :string, desc: <<-Desc, default: :newcopy
+overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。
+    Desc
+    option :upload, type: :boolean, desc: "Upload when need upload"
     def compare(rpath=nil)
-      lapproot = File.expand_path(BaiduPcs::Config.local_app_root)
-      FileUtils.mkdir_p lapproot unless File.directory?(lapproot)
+      opts = options.dup
+      res = BaiduPcs::Fs.list(rpath, {})
+      files = res.body[:list].map do |item|
+        path = item[:path].to_s.sub("#{BaiduPcs::Config.app_root}/", '')
+        #path += '/' if item[:isdir]==1 and not path.end_with?('/')
+        path
+      end.sort
+      lfiles = Dir[File.join(*[BaiduPcs::Config.local_app_root, rpath, "*"].compact)].map{|f| f.sub("#{BaiduPcs::Config.local_app_root}/", '')}.sort
+      to_down = files - lfiles
+      if to_down.size > 0
+        say "Not download files: #{to_down.size}"
+      end
+      to_up = lfiles - files
+      if to_up.size > 0
+        say "Not upload files: #{to_up.size}"
+        #to_up = to_up.first(3)
+        need_upload = opts.delete(:upload)
+        to_up.each do |f|
+          puts "==upload file: #{f} ..."
+          BaiduPcs::Fs.upload("#{BaiduPcs::Config.local_app_root}/#{f}", f, opts.dup) if need_upload
+        end
+        say to_up 
+      end
+      say "end ..."
     end
     map cmp: :compare
 

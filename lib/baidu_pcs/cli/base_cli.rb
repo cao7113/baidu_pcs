@@ -5,8 +5,8 @@ module BaiduPcs::Cli
   class BaseCli < Thor
     include Thor::Actions
 
-    class_option :noprogress, type: :boolean, default: false, desc: "display CURL progress-bar when interacting with remote resources"
-    class_option :verbose, type: :boolean, default: false, desc: "display verbose info for tracking"
+    class_option :noprogress, type: :boolean, desc: "display CURL progress-bar when interacting with remote resources", default: true
+    class_option :verbose, type: :boolean, desc: "display verbose info for tracking"
 
     desc 'setup APP_NAME, API_KEY, SECRET_KEY [, LOCAL_APP_ROOT]', 'setup app settings'
     def setup(app_name, api_key, secret_key, local_app_root=nil)
