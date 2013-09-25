@@ -3,9 +3,104 @@
 #http://developer.baidu.com/wiki/index.php?title=docs/pcs/rest/file_data_apis_list
 
 require "baidu_pcs"
-module BaiduPcs
-  class Fs < Base
+require "digest"
 
+module BaiduPcs
+
+  #cao@tj-desktop:~/dev/baidu_pcs$ be bin/baidupcs meta
+  #{:fs_id=>1340895656, :path=>"/apps/uasset", :ctime=>1378535715, :mtime=>1378535715, :block_list=>"", :size=>0, :isdir=>1, :ifhassubdir=>1, :filenum=>0}
+  #cao@tj-desktop:~/dev/baidu_pcs$ be bin/baidupcs meta Gemfile
+  #{:fs_id=>2730525873, :path=>"/apps/uasset/Gemfile", :ctime=>1378888179, :mtime=>1378888179, :block_list=>"[\"4bec0132b488fde4d0806cd654be3b2e\"]", :size=>127, :isdir=>0, :ifhassubdir=>0, :filenum=>0}
+  class FileMeta
+    attr_accessor :origin_hash, :_mate
+    def initialize(hash)
+      raise "Invalid hash for file meta" if hash.blank?
+      @origin_hash = hash
+      #temp fix json parse FIXME
+      if block_list.is_a?(String) and block_list.length > 0
+        @origin_hash[:block_list] = MultiJson.load(block_list)
+      end
+    end
+    def self.from_local(path)
+      lpath = File.expand_path(path)
+      raise "Not found file: #{lpath}" unless File.exists?(lpath)
+      new(path: lpath, 
+          ctime: File.ctime(lpath).to_i, 
+          mtime: File.mtime(lpath).to_i,
+          block_list: [Digest::MD5.hexdigest(File.read(path))], #lazy load???
+          size: File.file?(lpath) ? File.size(lpath) : 0,
+          isdir: File.directory?(lpath) ? 1 : 0,
+          ifhassubdir: 0, #not use FIXME
+          filenum: 0, #not use now
+          fs_id: nil, 
+          local: true) #标识为本地文件?
+    end
+    def self.from_remote(rpath)
+      Fs.meta(rpath)
+    end
+
+    #另一侧的对象
+    def mate
+      return @_mate if @_mate
+      @_mate = local ? self.class.from_remote(relative_path) : self.class.from_local(matepath)
+    end
+    #获取另一侧的路径，如当前是local，则获取remote的；否则获取local的
+    def matepath
+      if local
+        path.sub(Config.local_app_root, Config.app_root)
+      else
+        path.sub(Config.app_root, Config.local_app_root)
+      end
+    end
+    def relative_path
+      p = path.sub(local ? Config.local_app_root : Config.app_root, '')
+      return p[1..-1] if p.start_with?("/")
+      p
+    end
+
+    def same?
+      if isdir?
+        #目录直接比较文件内容
+        #TODO
+      else
+        #比较算法， 大小 --> md5
+        md5 == mate.md5
+      end
+    end
+    #相应对象比较
+    def diff
+    end
+    def self.diff(rpath)
+    end
+
+
+    def md5
+      isdir? ? nil : block_list.first
+    end
+
+    def ctime
+      Time.at(@origin_hash[:ctime])
+    end
+    def mtime
+      Time.at(@origin_hash[:mtime])
+    end
+    def isdir?
+      isdir.to_i > 0
+    end
+    def hassub?
+      ifhassubdir.to_i > 0
+    end
+
+    def info
+      origin_hash #TODO FIXME
+    end
+
+    def method_missing(method, *args)
+      @origin_hash[method.to_sym] #use like: Config.app_name --> :app_name in config file
+    end
+  end
+  
+  class Fs < Base
     FILE_BASE_URL = "#{PCS_BASE_URL}/file"
 
     #path:  local file path
@@ -46,8 +141,9 @@ module BaiduPcs
       post(FILE_BASE_URL, method_params(:mkdir, path: "#{Config.app_root}/#{rpath}"))
     end
 
-    def self.meta(rpath)
-      get(FILE_BASE_URL, method_params(:meta, path: "#{Config.app_root}/#{rpath}"))
+    def self.meta(rpath=nil)
+      res = get(FILE_BASE_URL, method_params(:meta, path: "#{Config.app_root}/#{rpath}"))
+      FileMeta.new(res.body[:list].first)
     end
     def self.meta_in_batch(param)
       post(FILE_BASE_URL, method_params(:meta), {param: param})

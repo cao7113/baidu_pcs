@@ -25,5 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry-nav"
   spec.add_runtime_dependency "typhoeus", "~> 0.6.5"
   spec.add_runtime_dependency "multi_json"
+  spec.add_runtime_dependency "oj"
   spec.add_runtime_dependency "thor" #slop
 end

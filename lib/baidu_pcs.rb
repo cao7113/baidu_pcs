@@ -17,8 +17,15 @@ module BaiduPcs
       def instance
         @_instance ||= new
       end
+      def keys
+        instance.config.keys
+      end
+      def file
+        CONFIG_FILE     
+      end
+      #use like: Config.app_name --> :app_name in config file
       def method_missing(method, *args)
-        instance.config[method.to_sym] #use like: Config.app_name --> :app_name in config file
+        instance.config[method.to_sym]
       end
     end
    private

@@ -3,7 +3,7 @@ require 'baidu_pcs/fs'
 
 module BaiduPcs::Cli
   class FsCli < BaseCli
-    default_task :list
+    #default_task :list
 
     no_tasks do
       def print_item(item)
@@ -48,7 +48,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       select_files.each do |f|
         BaiduPcs::Fs.upload(f, "#{rdir}#{rdir ? '/' : ''}#{f.sub("#{origin_local_path}/", "")}", opts.dup) #dup good
         cnt += 1
-        puts "==uploading #{f} ..." 
+        puts "==uploading #{f} ..." if options[:verbose]
       end
       puts "upload files: #{cnt} files"
     end
@@ -85,10 +85,18 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       say BaiduPcs::Fs.mkdir(rpath).body
     end
 
-    desc 'meta RPATH', 'get meta info about a remote path, file or directory'
-    def meta(rpath)
-      say BaiduPcs::Fs.meta(rpath).body
+    desc 'meta [RPATH]', 'get meta info about a remote path, file or directory'
+    def meta(rpath=nil)
+      fmeta = BaiduPcs::Fs.meta(rpath)
+      say fmeta.info
     end
+
+    desc "compare [RPATH]", "比对文件或目录元信息"
+    def compare(rpath=nil)
+      lapproot = File.expand_path(BaiduPcs::Config.local_app_root)
+      FileUtils.mkdir_p lapproot unless File.directory?(lapproot)
+    end
+    map cmp: :compare
 
     desc 'list [RPATH]', 'list a remote path for all file or directory'
     option :by, desc: "sort field, possible values: [time | name | size]",  type: :string 
@@ -108,6 +116,9 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       end
     end
     map ls: :list
+
+    #TODO compare dir
+    #目录文件比较算法
 
     desc 'move FROM_RPATH, TO_RPATH', 'move a remote path/to/from --> path/to/to'
     def move(from_rpath, to_rpath)

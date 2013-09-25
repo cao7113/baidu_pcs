@@ -10,7 +10,7 @@ module BaiduPcs::Cli
 
     desc 'setup APP_NAME, API_KEY, SECRET_KEY [, LOCAL_APP_ROOT]', 'setup app settings'
     def setup(app_name, api_key, secret_key, local_app_root=nil)
-      local_app_root ||= File.expand_path("~/baidu/#{app_name}")
+      local_app_root = File.expand_path(local_app_root||"~/baidu/#{app_name}")
       require 'erb'
       content = (ERB.new <<-EOF).result(binding)
 :app_name: <%=app_name||'<_app_name>'%>
@@ -45,6 +45,13 @@ module BaiduPcs::Cli
       raise "Invalid token: #{atoken}!" if atoken !~ /^[\da-f\.\-]*$/
       File.open(BaiduPcs::CONFIG_FILE, "a"){|f| f.puts ":access_token: #{atoken}" }
       say "Have append access token into file: #{BaiduPcs::CONFIG_FILE}"
+    end
+
+    desc 'configfile', '显示config相关信息'
+    def configfile
+      puts "Using config file: #{BaiduPcs::CONFIG_FILE}"
+      puts "With content:"
+      puts File.read(BaiduPcs::CONFIG_FILE)
     end
 
     desc 'quota', 'quota space for storage'
