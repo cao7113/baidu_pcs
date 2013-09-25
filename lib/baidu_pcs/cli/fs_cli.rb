@@ -20,6 +20,39 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       print_item res.body
     end
 
+    desc "batch_upload LOCAL_DIR RDIR [, FILE_PATTERN]", <<-Desc
+    upload multiple local files into remote dir for sync or backup"
+    注意模式需要转义，如：
+    cao@tj-desktop:~/dev/baidu_pcs$ be bin/baidupcs batch_upload test test \*.txt --noprogress -r --dryrun
+    t2/t22/t3/a2.txt
+    t2/t22/t3/a1.txt
+    Desc
+    option :dryrun, desc: "列出要操作的文件", type: :boolean #, default: true 
+    option :ondup, type: :string, desc: <<-Desc, default: :newcopy
+overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。
+    Desc
+    option :recursive, desc: "对子目录递归上传", type: :boolean, aliases: [:r]
+    def batch_upload(local_dir, rdir, file_pattern="*")
+      opts = options.dup
+      local_path = File.expand_path(local_dir)
+      origin_local_path = local_path
+      if opts.delete(:recursive)
+        local_path += "/**"
+      end
+      select_files = Dir.glob(File.join(local_path, file_pattern)).select{|f| File.file?(f)}
+      if opts.delete(:dryrun)
+        select_files.each{|f| puts f.sub("#{origin_local_path}/", "")}
+        return
+      end
+      cnt = 0
+      select_files.each do |f|
+        BaiduPcs::Fs.upload(f, "#{rdir}#{rdir ? '/' : ''}#{f.sub("#{origin_local_path}/", "")}", opts.dup) #dup good
+        cnt += 1
+        puts "==uploading #{f} ..." 
+      end
+      puts "upload files: #{cnt} files"
+    end
+
     desc 'download RPATH', 'download a remote file, DONOT!!! support download a dir'
     option :tosync, desc: "是否下载到本地同步目录！", type: :boolean, default: false
     def download(rpath)
@@ -61,10 +94,18 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
     option :by, desc: "sort field, possible values: [time | name | size]",  type: :string 
     option :order, desc: "possible value: [asc | desc]", type: :string#, default: :desc
     option :limit, desc: "n1-n2, default n1=0", type: :string 
-    option :progress, desc: "progress bar control", type: :boolean, default: true
+    option :onlyname, desc: "just list name", type: :boolean #, default: true
     def list(rpath=nil)
-      res = BaiduPcs::Fs.list(rpath, options.dup)
-      res.body[:list].each{|item| print_item(item) }
+      opts = options.dup
+      onlyname = opts.delete(:onlyname)
+      res = BaiduPcs::Fs.list(rpath, opts)
+      res.body[:list].each do |item|
+        if onlyname
+          puts "#{File.basename(item[:path])}#{'/' if item[:isdir]==1}"
+        else
+          print_item(item)
+        end
+      end
     end
     map ls: :list
 
