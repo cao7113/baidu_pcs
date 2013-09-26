@@ -5,38 +5,32 @@ require 'yaml'
 
 require "baidu_pcs/core_ext"
 require "baidu_pcs/version"
+require "baidu_pcs/config"
 
 module BaiduPcs
-
   PCS_BASE_URL = "https://pcs.baidu.com/rest/2.0/pcs"
-  CONFIG_FILE = File.expand_path(ENV['_BAIDU_PCS_CONFIG_FILE']||"~/.baidu_pcs_config.yml")
 
-  class Config
-    attr_reader :config
-    class << self
-      def instance
-        @_instance ||= new
-      end
-      def keys
-        instance.config.keys
-      end
-      def file
-        CONFIG_FILE     
-      end
-      #use like: Config.app_name --> :app_name in config file
-      def method_missing(method, *args)
-        instance.config[method.to_sym]
-      end
+  #code: 404, msg: {"error_code":31066,"error_msg":"file does not exist","request_id":4043575136}
+  class PcsError < StandardError; end
+  class PcsRequestError < PcsError
+    attr_accessor :json_str, :hash, :http_code
+    def initialize(http_code, json_str)
+      @http_code = http_code
+      @json_str = json_str
+      @hash = MultiJson.load(json_str, symbolize_keys: true) rescue nil
     end
-   private
-    def initialize
-      raise "Not found file: #{CONFIG_FILE}, Please run config and setup firstly!" unless File.exists?(CONFIG_FILE)
-      @config = YAML.load_file(CONFIG_FILE)
+
+    def method_missing(method, *args)
+      hash[method.to_sym]
+    end
+
+    def to_s
+      "http code: #{http_code}, with info: #{hash.to_s}"
     end
   end
 
   class Base
-    attr_accessor :request, :options, :response, :body
+    attr_accessor :request, :options, :response, :body, :error
 
     def initialize(url, method=:get, params={}, body={}, opts={})
       [:noprogress, :verbose].each do |k|
@@ -60,9 +54,10 @@ module BaiduPcs
       @request.on_complete do |response|
         @response = response
         if response.success? #(mock || return_code == :ok) && response_code && response_code >= 200 && response_code < 300
+          #for download
           if response.headers["Content-Disposition"] =~ /attachment;file/ or response.headers["Content-Type"] =~ /image\//
             @body = response.body
-          else  #default as json
+          else  #default as json for general request
             @body = MultiJson.load(response.body, symbolize_keys: true)
           end
         elsif response.timed_out?
@@ -70,7 +65,7 @@ module BaiduPcs
         elsif response.code == 0
           raise "Could not get an http response, something's wrong: #{response.return_message} with options: #{options}"
         else
-          raise "Http request failed with code: #{response.code}, msg: #{response.body}"
+          @error = PcsRequestError.new(response.code, response.body)
         end
       end
       self
@@ -78,10 +73,14 @@ module BaiduPcs
 
     def run!
       @request.run
+      raise error if has_error?
       self
     end
     def ok?
       response.success?
+    end
+    def has_error?
+      !!error
     end
     def http_code
       response.code

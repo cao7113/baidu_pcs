@@ -91,38 +91,44 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       say fmeta.info
     end
 
-    desc "compare [RPATH]", "比对文件或目录元信息"
+    #因为批量上传中ondup参数没有重复忽略的选项，所以用这个方法进行解决
+    desc "compare_dir [RDIR]", "根据文件名差异对目录进行同步"
     option :ondup, type: :string, desc: <<-Desc, default: :newcopy
 overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。
     Desc
-    option :upload, type: :boolean, desc: "Upload when need upload"
-    def compare(rpath=nil)
+    option :upload, type: :boolean, desc: "Upload when need"
+    def compare_dir(rpath=nil)
       opts = options.dup
       res = BaiduPcs::Fs.list(rpath, {})
       files = res.body[:list].map do |item|
-        path = item[:path].to_s.sub("#{BaiduPcs::Config.app_root}/", '')
-        #path += '/' if item[:isdir]==1 and not path.end_with?('/')
-        path
+        item[:path].to_s.sub("#{BaiduPcs::Config.app_root}/", '')
       end.sort
       lfiles = Dir[File.join(*[BaiduPcs::Config.local_app_root, rpath, "*"].compact)].map{|f| f.sub("#{BaiduPcs::Config.local_app_root}/", '')}.sort
       to_down = files - lfiles
       if to_down.size > 0
-        say "Not download files: #{to_down.size}"
+        say "Local missing #{to_down.size} files:"
+        #download ???
+        say to_down.join(" ")
       end
       to_up = lfiles - files
       if to_up.size > 0
-        say "Not upload files: #{to_up.size}"
-        #to_up = to_up.first(3)
+        say "Local has #{to_up.size} more files: "
         need_upload = opts.delete(:upload)
         to_up.each do |f|
           puts "==upload file: #{f} ..."
           BaiduPcs::Fs.upload("#{BaiduPcs::Config.local_app_root}/#{f}", f, opts.dup) if need_upload
         end
-        say to_up 
+        say to_up.join(" ")
       end
-      say "end ..."
+      say "Synced #{to_down.size} missing and #{to_up.size} more at local #{BaiduPcs::Config.local_app_root}/#{rpath} ..."
     end
-    map cmp: :compare
+    map cmpd: :compare_dir
+
+    desc 'compare_file RPATH', 'check version is synced for a file or a directory'
+    def compare_file(rpath)
+      BaiduPcs::FileMeta.diff(rpath)
+    end
+    map cmpf: :compare_file
 
     desc 'list [RPATH]', 'list a remote path for all file or directory'
     option :by, desc: "sort field, possible values: [time | name | size]",  type: :string 

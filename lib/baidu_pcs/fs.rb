@@ -12,9 +12,10 @@ module BaiduPcs
   #cao@tj-desktop:~/dev/baidu_pcs$ be bin/baidupcs meta Gemfile
   #{:fs_id=>2730525873, :path=>"/apps/uasset/Gemfile", :ctime=>1378888179, :mtime=>1378888179, :block_list=>"[\"4bec0132b488fde4d0806cd654be3b2e\"]", :size=>127, :isdir=>0, :ifhassubdir=>0, :filenum=>0}
   class FileMeta
-    attr_accessor :origin_hash, :_mate
+    attr_accessor :origin_hash, :_mate, :_rpath
     def initialize(hash)
       raise "Invalid hash for file meta" if hash.blank?
+      @_rpath = hash[:path]
       @origin_hash = hash
       #temp fix json parse FIXME
       if block_list.is_a?(String) and block_list.length > 0
@@ -23,7 +24,8 @@ module BaiduPcs
     end
     def self.from_local(path)
       lpath = File.expand_path(path)
-      raise "Not found file: #{lpath}" unless File.exists?(lpath)
+      #raise "Not found file: #{lpath}" unless File.exists?(lpath)
+      return nil unless File.exists?(lpath)
       new(path: lpath, 
           ctime: File.ctime(lpath).to_i, 
           mtime: File.mtime(lpath).to_i,
@@ -43,6 +45,9 @@ module BaiduPcs
     def mate
       return @_mate if @_mate
       @_mate = local ? self.class.from_remote(relative_path) : self.class.from_local(matepath)
+    rescue =>e
+      $stderr.puts e.message
+      nil
     end
     #获取另一侧的路径，如当前是local，则获取remote的；否则获取local的
     def matepath
@@ -57,20 +62,54 @@ module BaiduPcs
       return p[1..-1] if p.start_with?("/")
       p
     end
-
-    def same?
-      if isdir?
-        #目录直接比较文件内容
-        #TODO
-      else
-        #比较算法， 大小 --> md5
-        md5 == mate.md5
-      end
+    def self.local_path(rpath)
+      "#{Config.local_app_root}/#{rpath}"
     end
+    def self.remote_path(rpath)
+      "#{Config.app_root}/#{rpath}"
+    end
+    def local_path
+      local ? path : matepath
+    end
+    def remote_path
+      local ? matepath : path
+    end
+
     #相应对象比较
     def diff
+      unless mate
+        puts "Its mate(#{matepath}) does not exist now! you can #{local ? 'upload' : 'download'} it!"
+        return
+      end
+      result = ""
+      #比对大小， md5
+      if size == mate.size
+        result = "大小相等"
+        if md5 == mate.md5
+          result = "MD5相等"
+        end
+      else
+        result = "大小不等"
+      end
+      puts result
     end
     def self.diff(rpath)
+      meta = from_remote(rpath) rescue nil
+      unless meta
+        $stderr.puts "Remote asset: #{rpath} does not exist!"
+        local_path = FileMeta.local_path(rpath)
+        if File.exists?(local_path)
+          $stderr.puts "Local path: #{local_path} exists! upload?"
+        else
+          $stderr.puts "Local path: #{local_path} does not exists, maybe typo error!"
+        end
+        return
+      end
+      if meta.isdir? 
+        $stderr.puts "Warning：目前仅支持文件比较，这是远程目录：#{meta.remote_path}"
+        return
+      end
+      meta.diff
     end
 
     def md5
@@ -91,11 +130,11 @@ module BaiduPcs
     end
 
     def info
-      origin_hash #TODO FIXME
+      origin_hash #TODO
     end
 
     def method_missing(method, *args)
-      @origin_hash[method.to_sym] #use like: Config.app_name --> :app_name in config file
+      @origin_hash[method.to_sym]
     end
   end
   

@@ -26,7 +26,6 @@ Steps:
 * `baidupcs setup _app_name _api_key _secret_key`
 * `baidupcs config` to get an access token
 * get help by `baidupcs --help` at any time
-* another bins: `baidupcs_db, baidupcs_local`
 
 List remote files:
 
@@ -49,7 +48,9 @@ cao@tj-desktop:~/dev/baidu_pcs$ baidupcs ls
 ## TODO
 
 * 文件夹批量索引和同步问题
-* 分享文件列表
+* 分享文件列表，如何自动化完成分享和获取分享链接？
+* 对log的支持
+* 错误体系构建
 * 应用拓广
 
 ## Test and Running

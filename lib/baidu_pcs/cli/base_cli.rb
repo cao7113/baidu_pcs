@@ -47,8 +47,8 @@ module BaiduPcs::Cli
       say "Have append access token into file: #{BaiduPcs::CONFIG_FILE}"
     end
 
-    desc 'configfile', '显示config相关信息'
-    def configfile
+    desc 'catconfig', '显示config相关信息'
+    def catconfig
       puts "Using config file: #{BaiduPcs::CONFIG_FILE}"
       puts "With content:"
       puts File.read(BaiduPcs::CONFIG_FILE)
