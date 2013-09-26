@@ -47,11 +47,13 @@ cao@tj-desktop:~/dev/baidu_pcs$ baidupcs ls
 
 ## TODO
 
-* 文件夹批量索引和同步问题
+* Typhoeus优化及客户端模拟
 * 分享文件列表，如何自动化完成分享和获取分享链接？
 * 对log的支持
 * 错误体系构建
 * 应用拓广
+  * DB备份
+  * 静态资源存储支持
 
 ## Test and Running
 

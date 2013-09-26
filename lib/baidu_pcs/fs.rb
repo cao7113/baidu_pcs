@@ -130,7 +130,7 @@ module BaiduPcs
     end
 
     def info
-      origin_hash #TODO
+      "#{isdir? ? 'Dir' : 'File'}(#{fs_id}): #{path} ctime: #{ctime} mtime: #{mtime} size: #{size} blocks: #{block_list} #{'Has subdir' if hassub?}"
     end
 
     def method_missing(method, *args)
@@ -171,8 +171,7 @@ module BaiduPcs
     #流式资源地址，可直接下载
     def self.streamurl(rpath)
       params = method_params(:download, path: "#{Config.app_root}/#{rpath}")
-      query_str = params.map{|k, v| "#{k}=#{v}"}.join("&") #可能有些转义问题
-      "#{FILE_BASE_URL}?#{query_str}"
+      "#{FILE_BASE_URL}?#{params.to_query_str}"
     end
 
     def self.mkdir(rpath)
@@ -233,8 +232,10 @@ module BaiduPcs
     #             Advanced
     #获取指定图片文件的缩略图
     def self.thumbnail(rpath, opts={})
-      params = method_params(:generate, path: "#{Config.app_root}/rpath").merge(opts.slice!(:quality, :height, :width))
-      get("#{PCS_BASE_URL}/thumbnail", params, opts)
+      params = method_params(:generate, path: "#{Config.app_root}/#{rpath}").merge(opts.extract!(:quality, :height, :width))
+      #get("#{PCS_BASE_URL}/thumbnail", params, opts)
+      #TODO stub 测试，近构建链接
+      "#{PCS_BASE_URL}/thumbnail?" + params.to_query_str
     end
     
     #文件增量更新操作查询接口。本接口有数秒延迟，但保证返回结果为最终一致。

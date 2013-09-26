@@ -80,6 +80,15 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
     end
     map url: :streamurl
 
+    desc "thumbnail RPATH", "获取缩略图"
+    option :quality, type: :numeric, desc: "缩略图的质量，默认为“100”，取值范围(0,100]", default: 100
+    option :height, type: :numeric, desc: "指定缩略图的高度，取值范围为(0,1600]", default: 200
+    option :width, type: :numeric, desc: "指定缩略图的宽度，取值范围为(0,1600]", default: 200
+    def thumbnail(rpath)
+      opts = options.dup
+      say BaiduPcs::Fs.thumbnail(rpath, opts)
+    end
+
     desc 'mkdir RPATH', 'mkdir remote path, e.g. mkdir path/to/newdir, support b/c1/d2'
     def mkdir(rpath)
       say BaiduPcs::Fs.mkdir(rpath).body
@@ -88,7 +97,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
     desc 'meta [RPATH]', 'get meta info about a remote path, file or directory'
     def meta(rpath=nil)
       fmeta = BaiduPcs::Fs.meta(rpath)
-      say fmeta.info
+      puts fmeta.info
     end
 
     #因为批量上传中ondup参数没有重复忽略的选项，所以用这个方法进行解决
