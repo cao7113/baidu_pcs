@@ -20,7 +20,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       print_item res.body
     end
 
-    desc "batch_upload LOCAL_DIR RDIR [, FILE_PATTERN]", <<-Desc
+    desc "rupload LOCAL_DIR RDIR [, FILE_PATTERN]", <<-Desc
     upload multiple local files into remote dir for sync or backup"
     注意模式需要转义，如：
     cao@tj-desktop:~/dev/baidu_pcs$ be bin/baidupcs batch_upload test test \*.txt --noprogress -r --dryrun
