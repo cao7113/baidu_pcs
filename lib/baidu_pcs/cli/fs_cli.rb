@@ -31,8 +31,8 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
     option :ondup, type: :string, desc: <<-Desc, default: :newcopy
 overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。
     Desc
-    option :recursive, desc: "对子目录递归上传", type: :boolean, aliases: [:r]
-    def batch_upload(local_dir, rdir, file_pattern="*")
+    option :recursive, desc: "对子目录递归上传", type: :boolean, aliases: [:r], default: true
+    def rupload(local_dir, rdir, file_pattern="*")
       opts = options.dup
       local_path = File.expand_path(local_dir)
       origin_local_path = local_path
