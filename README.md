@@ -2,6 +2,8 @@
 
 Try [baidu pcs](http://developer.baidu.com/ms/pcs) using ruby!
 
+docs: http://developer.baidu.com/wiki/index.php?title=docs/pcs
+
 ## Installation
 
 Add this line to your application's Gemfile:
