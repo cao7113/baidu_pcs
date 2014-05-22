@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+file = ARGV[0]||"./file_data_apis_error"
+
+if File.exist?(file)
+  hash = {}
+  File.foreach(file).each do |l|
+    next if l =~ /^#/
+    item = l.chomp.split(/\s{2,}/)
+    hash[item[1].to_i] = {http: item[0].to_i, msg: item[2], zhmsg: item[3]}
+  end
+  require 'yaml'
+  ymlfile = file << ".yml"
+  File.write(ymlfile, hash.to_yaml)
+  puts "Write result hash into #{ymlfile}"
+else
+  puts "No file:" << file
+end

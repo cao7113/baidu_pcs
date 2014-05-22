@@ -10,6 +10,14 @@ require "baidu_pcs/config"
 module BaiduPcs
   PCS_BASE_URL = "https://pcs.baidu.com/rest/2.0/pcs"
 
+  def self.root
+    File.expand_path '../..', __FILE__ #or File.dirname __dir__ on ruby 2.0+
+  end
+
+  def self.gempath(path)
+    File.join(root, path)
+  end
+
   #code: 404, msg: {"error_code":31066,"error_msg":"file does not exist","request_id":4043575136}
   class PcsError < StandardError; end
   class PcsRequestError < PcsError
@@ -73,7 +81,7 @@ module BaiduPcs
 
     def run!
       @request.run
-      raise error if has_error?
+      #raise error if has_error?
       self
     end
     def ok?

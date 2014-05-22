@@ -1,0 +1,269 @@
+---
+0:
+  :http: 200
+  :msg: no error
+  :zhmsg: "没有错误"
+3:
+  :http: 400
+  :msg: Unsupported open api
+  :zhmsg: "不支持此接口"
+4:
+  :http: 403
+  :msg: No permission to do this operation
+  :zhmsg: "没有权限执行此操作"
+5:
+  :http: 403
+  :msg: Unauthorized client IP address
+  :zhmsg: IP未授权
+31001:
+  :http: 503
+  :msg: db query error
+  :zhmsg: "数据库查询错误"
+31002:
+  :http: 503
+  :msg: db connect error
+  :zhmsg: "数据库连接错误"
+31003:
+  :http: 503
+  :msg: db result set is empty
+  :zhmsg: "数据库返回空结果"
+31021:
+  :http: 503
+  :msg: network error
+  :zhmsg: "网络错误"
+31022:
+  :http: 503
+  :msg: can not access server
+  :zhmsg: "暂时无法连接服务器"
+31023:
+  :http: 400
+  :msg: param error
+  :zhmsg: "输入参数错误"
+31024:
+  :http: 400
+  :msg: app id is empty
+  :zhmsg: app id为空
+31025:
+  :http: 503
+  :msg: bcs error
+  :zhmsg: "后端存储错误"
+31041:
+  :http: 403
+  :msg: bduss is invalid
+  :zhmsg: "用户的cookie不是合法的百度cookie"
+31042:
+  :http: 403
+  :msg: user is not login
+  :zhmsg: "用户未登陆"
+31043:
+  :http: 403
+  :msg: user is not active
+  :zhmsg: "用户未激活"
+31044:
+  :http: 403
+  :msg: user is not authorized
+  :zhmsg: "用户未授权"
+31045:
+  :http: 403
+  :msg: user not exists
+  :zhmsg: "用户不存在"
+31046:
+  :http: 403
+  :msg: user already exists
+  :zhmsg: "用户已经存在"
+31061:
+  :http: 400
+  :msg: file already exists
+  :zhmsg: "文件已经存在"
+31062:
+  :http: 400
+  :msg: file name is invalid
+  :zhmsg: "文件名非法"
+31063:
+  :http: 400
+  :msg: file parent path does not exist
+  :zhmsg: "文件父目录不存在"
+31064:
+  :http: 403
+  :msg: file is not authorized
+  :zhmsg: "无权访问此文件"
+31065:
+  :http: 400
+  :msg: directory is full
+  :zhmsg: "目录已满"
+31066:
+  :http: 403
+  :msg: file does not exist
+  :zhmsg: "文件不存在"
+31067:
+  :http: 503
+  :msg: file deal failed
+  :zhmsg: "文件处理出错"
+31068:
+  :http: 503
+  :msg: file create failed
+  :zhmsg: "文件创建失败"
+31069:
+  :http: 503
+  :msg: file copy failed
+  :zhmsg: "文件拷贝失败"
+31070:
+  :http: 503
+  :msg: file delete failed
+  :zhmsg: "文件删除失败"
+31071:
+  :http: 503
+  :msg: get file meta failed
+  :zhmsg: "不能读取文件元信息"
+31072:
+  :http: 503
+  :msg: file move failed
+  :zhmsg: "文件移动失败"
+31073:
+  :http: 503
+  :msg: file rename failed
+  :zhmsg: "文件重命名失败"
+31081:
+  :http: 503
+  :msg: superfile create failed
+  :zhmsg: superfile创建失败
+31082:
+  :http: 503
+  :msg: superfile block list is empty
+  :zhmsg: superfile 块列表为空
+31083:
+  :http: 503
+  :msg: superfile update failed
+  :zhmsg: superfile 更新失败
+31101:
+  :http: 503
+  :msg: tag internal error
+  :zhmsg: tag系统内部错误
+31102:
+  :http: 503
+  :msg: tag param error
+  :zhmsg: tag参数错误
+31103:
+  :http: 503
+  :msg: tag database error
+  :zhmsg: tag系统错误
+31110:
+  :http: 403
+  :msg: access denied to set quota
+  :zhmsg: "未授权设置此目录配额"
+31111:
+  :http: 400
+  :msg: quota only sopport 2 level directories
+  :zhmsg: "配额管理只支持两级目录"
+31112:
+  :http: 400
+  :msg: exceed quota
+  :zhmsg: "超出配额"
+31113:
+  :http: 403
+  :msg: the quota is bigger than one of its parent directorys
+  :zhmsg: "配额不能超出目录祖先的配额"
+31114:
+  :http: 403
+  :msg: the quota is smaller than one of its sub directorys
+  :zhmsg: "配额不能比子目录配额小"
+31141:
+  :http: 503
+  :msg: thumbnail failed, internal error
+  :zhmsg: "请求缩略图服务失败"
+110:
+  :http: 401
+  :msg: Access token invalid or no longer valid
+  :zhmsg: Access Token不正确或者已经过期
+31201:
+  :http: 400
+  :msg: signature error
+  :zhmsg: "签名错误"
+31203:
+  :http: 400
+  :msg: acl put error
+  :zhmsg: "设置acl失败"
+31204:
+  :http: 400
+  :msg: acl query error
+  :zhmsg: "请求acl验证失败"
+31205:
+  :http: 400
+  :msg: acl get error
+  :zhmsg: "获取acl失败"
+31079:
+  :http: 404
+  :msg: File md5 not found, you should use upload API to upload the whole file.
+  :zhmsg: "未找到文件MD5，请使用上传API上传整个文件。"
+31202:
+  :http: 404
+  :msg: object not exists
+  :zhmsg: "文件不存在"
+31206:
+  :http: 404
+  :msg: acl get error
+  :zhmsg: acl不存在
+31207:
+  :http: 400
+  :msg: bucket already exists
+  :zhmsg: bucket已存在
+31208:
+  :http: 400
+  :msg: bad request
+  :zhmsg: "用户请求错误"
+31209:
+  :http: 500
+  :msg: baidubs internal error
+  :zhmsg: "服务器错误"
+31210:
+  :http: 501
+  :msg: not implement
+  :zhmsg: "服务器不支持"
+31211:
+  :http: 403
+  :msg: access denied
+  :zhmsg: "禁止访问"
+31212:
+  :http: 503
+  :msg: service unavailable
+  :zhmsg: "服务不可用"
+31213:
+  :http: 503
+  :msg: service unavailable
+  :zhmsg: "重试出错"
+31214:
+  :http: 503
+  :msg: put object data error
+  :zhmsg: "上传文件data失败"
+31215:
+  :http: 503
+  :msg: put object meta error
+  :zhmsg: "上传文件meta失败"
+31216:
+  :http: 503
+  :msg: get object data error
+  :zhmsg: "下载文件data失败"
+31217:
+  :http: 503
+  :msg: get object meta error
+  :zhmsg: "下载文件meta失败"
+31218:
+  :http: 403
+  :msg: storage exceed limit
+  :zhmsg: "容量超出限额"
+31219:
+  :http: 403
+  :msg: request exceed limit
+  :zhmsg: "请求数超出限额"
+31220:
+  :http: 403
+  :msg: transfer exceed limit
+  :zhmsg: "流量超出限额"
+31298:
+  :http: 500
+  :msg: the value of KEY[VALUE] in pcs response headers is invalid
+  :zhmsg: "服务器返回值KEY非法"
+31299:
+  :http: 500
+  :msg: no KEY in pcs response headers
+  :zhmsg: "服务器返回值KEY不存在 "

@@ -140,6 +140,15 @@ module BaiduPcs
   
   class Fs < Base
     FILE_BASE_URL = "#{PCS_BASE_URL}/file"
+   
+    ERRORS = YAML.load(BaiduPcs.gempath('template/file_data_apis_error.yml'))
+
+    def detail_error
+      if has_error?
+        error_code = error.hash[:error_code]
+        ERRORS[error_code]
+      end
+    end
 
     #path:  local file path
     #rpath: 上传文件路径（含上传的文件名称)
