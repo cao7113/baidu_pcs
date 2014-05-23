@@ -10,31 +10,31 @@ module BaiduPcs::Cli
         print_in_columns [item[:fs_id], "#{item[:path].sub(BaiduPcs::Config.app_root+'/', '')}#{'/' if item[:isdir]==1}", item[:size], "#{Time.at(item[:mtime])}"] 
       end
     end
-    
-    desc 'upload LOCAL_PATH [, RPATH]', 'upload a local file /path/to/file --> /apps/appname/[rpath|file]'
-    option :ondup, type: :string, desc: <<-Desc, default: :newcopy
-overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。
-    Desc
-    def upload(local_path, rpath=nil)
-      res = BaiduPcs::Fs.upload(File.expand_path(local_path), rpath, options.dup)
-      print_item res.body
-    end
 
-    desc "rupload LOCAL_DIR RDIR [, FILE_PATTERN]", <<-Desc
-    upload multiple local files into remote dir for sync or backup"
-    注意模式需要转义，如：
-    baidupcs batch_upload test test \*.txt --noprogress -r --dryrun
-    t2/t22/t3/a2.txt
-    t2/t22/t3/a1.txt
-    Desc
-    option :dryrun, desc: "列出要操作的文件", type: :boolean #, default: true 
+    desc "upload LOCAL_PATH REMOTE_PATH [, FILE_PATTERN='*']", <<-Desc
+upload/put (multiple) local files into remote path
+注意模式需要转义，如：
+baidupcs batch_upload test test \*.txt --noprogress -r --dryrun
+t2/t22/t3/a2.txt
+t2/t22/t3/a1.txt
+Desc
+    option :dryrun, desc: "列出要操作的文件", type: :boolean, aliases: [:d] #, default: true 
     option :ondup, type: :string, desc: <<-Desc, default: :newcopy
 overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。
     Desc
     option :recursive, desc: "对子目录递归上传", type: :boolean, aliases: [:r], default: true
-    def rupload(local_dir, rdir, file_pattern="*")
+    def upload(local_dir, rdir, file_pattern="*")
       opts = options.dup
       local_path = File.expand_path(local_dir)
+      if File.file?(local_path)
+        puts "====upload a file: #{local_path} ..."
+        rpath = rdir.end_with?('/') ? "#{rdir}#{File.basename(local_dir)}" : rdir
+        res = BaiduPcs::Fs.upload(local_path, rpath, opts.slice(:ondup))
+        print_item res.body
+        return
+      end
+      #TODO: 断点续传
+      puts "====recursive upload a loal dir: #{local_path}"
       origin_local_path = local_path
       if opts.delete(:recursive)
         local_path += "/**"
@@ -46,12 +46,13 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       end
       cnt = 0
       select_files.each do |f|
-        BaiduPcs::Fs.upload(f, "#{rdir}#{rdir ? '/' : ''}#{f.sub("#{origin_local_path}/", "")}", opts.dup) #dup good
+        BaiduPcs::Fs.upload(f, "#{rdir}#{'/' if rdir}#{f.sub("#{origin_local_path}/", "")}", opts.dup) #dup good
         cnt += 1
         puts "==uploading #{f} ..." if options[:verbose]
       end
       puts "upload files: #{cnt} files"
     end
+    map put: :upload
 
     desc 'download RPATH', 'download a remote file, DONOT!!! support download a dir'
     option :tosync, desc: "是否下载到本地同步目录！", type: :boolean, default: false
@@ -73,6 +74,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       File.binwrite(local_path, body)
       say local_path
     end
+    map get: :download
 
     desc 'streamurl RPATH', 'get a stream-file url for using online, e.g. <img src="_streamurl" />'
     def streamurl(rpath)
@@ -182,7 +184,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
         say "Cancel to delete #{rpath}"
       end
     end
-    map del: :delete
+    map rm: :delete
 
     desc 'search KEYWORD [, RPATH]', 'search a keyword in remote path'
     option :recursive, type: :boolean, aliases: :r, default: false
