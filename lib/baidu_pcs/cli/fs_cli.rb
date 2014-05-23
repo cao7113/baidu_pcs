@@ -33,7 +33,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
         print_item res.body
         return
       end
-      #TODO: 断点续传
+      #TODO: 多/大文件断点续传
       puts "====recursive upload a loal dir: #{local_path}"
       origin_local_path = local_path
       if opts.delete(:recursive)
@@ -48,7 +48,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       select_files.each do |f|
         BaiduPcs::Fs.upload(f, "#{rdir}#{'/' if rdir}#{f.sub("#{origin_local_path}/", "")}", opts.dup) #dup good
         cnt += 1
-        puts "==uploading #{f} ..." if options[:verbose]
+        puts "==uploading #{f} ..." #if options[:verbose]
       end
       puts "upload files: #{cnt} files"
     end
