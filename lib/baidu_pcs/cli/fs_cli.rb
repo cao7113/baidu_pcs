@@ -24,8 +24,9 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
     Desc
     option :recursive, desc: "对子目录递归上传", type: :boolean, aliases: [:r], default: true
     def upload(local_dir, rdir, file_pattern="*")
-      logger_path = File.join(Dir.pwd, File.basename(local_dir), "pcs_upload.log")
+      logger_path = File.join(Dir.pwd, "pcs_upload_#{File.basename(local_dir)}.log")
       logger = File.open(logger_path, "w+")
+      logger.sync = true
       logger.puts "==I: #{Time.now.to_s} uploading from #{local_dir} to #{rdir} for #{file_pattern}..."
       logger.puts "==I: ...more log info in #{logger_path} ..."
       opts = options.dup

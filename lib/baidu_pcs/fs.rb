@@ -158,7 +158,7 @@ module BaiduPcs
         mkdir(File.dirname(rpath)) unless opts.delete(:not_check_dir) #检查远端路径是否存在，不存在则创建
       rescue => e
         #http code: 400, with info: {:error_code=>31061, :error_msg=>"file already exists", :request_id=>1874569089} (BaiduPcs::PcsRequestError)
-        puts "==>Warning: skipped exists dir: #{File.dirname(rpath)}" 
+        #puts "==>Warning: skipped exists dir: #{File.dirname(rpath)}" 
       end
       params[:ondup] = opts.delete(:ondup) if opts[:ondup]
       post(FILE_BASE_URL, params, {file: File.open(path)}, opts)
