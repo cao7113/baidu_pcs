@@ -81,7 +81,7 @@ module BaiduPcs
 
     def run!
       @request.run
-      #raise error if has_error?
+      raise error if has_error?
       self
     end
     def ok?

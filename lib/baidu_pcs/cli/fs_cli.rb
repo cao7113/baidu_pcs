@@ -24,25 +24,28 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
     Desc
     option :recursive, desc: "对子目录递归上传", type: :boolean, aliases: [:r], default: true
     def upload(local_dir, rdir, file_pattern="*")
+      logger_path = File.join(Dir.pwd, "pcs_upload.log")
+      logger = File.open(logger_path, "w+")
+      logger.puts "==I: #{Time.now.to_s} uploading from #{local_dir} to #{rdir} for #{file_pattern}..."
+      logger.puts "==I: ...more log info in #{logger_path} ..."
       opts = options.dup
       local_path = File.expand_path(local_dir)
       if File.file?(local_path)
-        puts "====upload a file: #{local_path} ..."
+        logger.puts "====upload a file: #{local_path} ..."
         rpath = rdir.end_with?('/') ? "#{rdir}#{File.basename(local_dir)}" : rdir
         res = BaiduPcs::Fs.upload(local_path, rpath, opts.slice(:ondup))
         print_item res.body
         return
       end
-      #TODO: 多/大文件断点续传, hash, log, ...
-      puts "====recursive upload a loal dir: #{local_path}"
+      logger.puts "====recursive upload a loal dir: #{local_path}"
       origin_local_path = local_path
-      if local_dir.end_with?('/')
+      if local_dir.end_with?('/') and File.basename(local_dir) != File.basename(rdir)
         rdir += File.basename(local_dir) 
       end
       if opts.delete(:recursive)
         local_path += "/**"
       end
-      select_files = Dir.glob(File.join(local_path, file_pattern)).select{|f| File.file?(f)}
+      select_files = Dir.glob(File.join(local_path, file_pattern)).sort
       if opts.delete(:dryrun)
         select_files.each{|f| puts f.sub("#{origin_local_path}/", "")}
         return
@@ -51,10 +54,15 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       total = select_files.size
       select_files.each do |f|
         cnt += 1
-        puts "==uploading (#{cnt}/#{total}) #{f} ..." #if options[:verbose]
-        BaiduPcs::Fs.upload(f, "#{rdir}#{'/' unless rdir.end_with?('/')}#{f.sub("#{origin_local_path}/", "")}", opts.dup) #dup good
+        begin
+          r_path = "#{rdir}#{'/' unless rdir.end_with?('/')}#{f.sub("#{origin_local_path}/", "")}"
+          logger.puts "==uploading (#{cnt}/#{total}) #{f} --> #{r_path} ..." #if options[:verbose]
+          BaiduPcs::Fs.upload(f, r_path, opts.dup) #dup good
+        rescue =>e
+          logger.puts "==Error: upload #{f} to #{r_path}, message: #{e.message}..."
+        end
       end
-      puts "upload files: #{cnt} files"
+      logger.puts "==upload files: #{cnt} files"
     end
     map put: :upload
 
