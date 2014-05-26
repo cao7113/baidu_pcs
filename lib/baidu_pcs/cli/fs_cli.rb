@@ -46,7 +46,7 @@ overwrite：表示覆盖同名文件；newcopy：表示生成文件副本并进�
       if opts.delete(:recursive)
         local_path += "/**"
       end
-      select_files = Dir.glob(File.join(local_path, file_pattern)).sort
+      select_files = Dir.glob(File.join(local_path, file_pattern)).select{|f| File.file?(f)}.sort
       if opts.delete(:dryrun)
         select_files.each{|f| puts f.sub("#{origin_local_path}/", "")}
         return

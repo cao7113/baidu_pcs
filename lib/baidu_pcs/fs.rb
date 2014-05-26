@@ -153,6 +153,7 @@ module BaiduPcs
     #path:  local file path
     #rpath: 上传文件路径（含上传的文件名称)
     def self.upload(path, rpath=nil, opts={})
+      return unless File.file?(path)
       params = method_params(:upload, path: "#{Config.app_root}/#{rpath||File.basename(path)}")
       begin
         mkdir(File.dirname(rpath)) unless opts.delete(:not_check_dir) #检查远端路径是否存在，不存在则创建
